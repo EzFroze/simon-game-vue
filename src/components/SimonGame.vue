@@ -45,11 +45,12 @@ export default {
       start: false,
       gameOver: false,
       baseParamColor: {
-        1: "blue",
-        2: "red",
-        3: "yellow",
-        4: "green"
+        1: "blueOpacity",
+        2: "redOpacity",
+        3: "yellowOpacity",
+        4: "greenOpacity"
       },
+      currentColor: "",
       opacityValue: {
         blueOpacity: false,
         redOpacity: false,
@@ -63,8 +64,8 @@ export default {
   },
   methods: {
     restartClick() {
-      this.start = false
       this.score = 0
+      this.startClick()
     },
     startClick() {
       this.start = true
@@ -76,26 +77,20 @@ export default {
       return Math.round(rand)
     },
     startGameBot(level) {
-      let i = 0
-      let timer = setInterval(() => {
-        const item = this.gameArray[i]
-        i++
-        let color = this.baseParamColor[item] + "Opacity"
-        this.opacityOnClick(color, level)
-      }, level)
-
-      setTimeout(() => clearInterval(timer), level * this.gameArray.length)
+      this.gameArray.forEach((el, index) => {
+        setTimeout(() => {
+          this.currentColor = this.baseParamColor[el]
+          this.opacityOnClick(this.currentColor)
+        }, level * (index + 1))
+      })
     },
-    opacityOnClick(value, level = 200) {
+    opacityOnClick(color, level = 200) {
+      this.opacityValue[color] = true
       setTimeout(() => {
-        this.opacityValue[value] = false
+        this.opacityValue[color] = false
       }, level)
-      this.opacityValue[value] = true
     }
   },
-  updated() {
-    // this.gameArray.push(this.randomInteger(1,4))
-  }
 }
 </script>
 
