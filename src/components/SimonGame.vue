@@ -27,9 +27,25 @@
       </div>
     </div>
     <div class="right">
+      <h2 class="lose" v-if="gameOver && start">Вы проиграли!</h2>
       <h1>Score: {{score}}</h1>
       <button v-if="!start" @click="startClick">Start</button>
-      <button v-if="start" @click="restartClick">Restart</button>
+      <hr />
+      <h2>Выберите сложность</h2>
+      <div class="selectLevel">
+        <div>
+          <input type="radio" id="easy" name="level" value="easyLevel" v-model="currentLevel">
+          <label for="easy">Легкий</label>
+        </div>
+        <div>
+          <input type="radio" id="medium" name="level" value="mediumLevel" v-model="currentLevel">
+          <label for="medium">Средний</label>
+        </div>
+        <div>
+          <input type="radio" id="hard" name="level" value="hardLevel" v-model="currentLevel">
+          <label for="hard">Сложный</label>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -57,51 +73,127 @@ export default {
         yellowOpacity: false,
         greenOpacity: false,
       },
-      easyLevel: 1500,
-      mediumLevel: 1000,
-      hardLevel: 400
+      levels: {
+        easyLevel: 1500,
+        mediumLevel: 1000,
+        hardLevel: 400
+      },
+      currentLevel: "easyLevel",
+      isClickable: false
     }
   },
   methods: {
-    restartClick() {
-      this.score = 0
-      this.startClick()
-    },
     startClick() {
       this.start = true
-      this.gameArray.push(this.randomInteger(1, 4))
-      this.startGameBot(this.mediumLevel)
+      this.gameOver = false
+      this.startGameBot(this.getLevel)
     },
     randomInteger(min, max) {
       const rand = min - 0.5 + Math.random() * (max - min + 1)
       return Math.round(rand)
     },
     startGameBot(level) {
+      this.gameArray.push(this.randomInteger(1, 4))
       this.gameArray.forEach((el, index) => {
         setTimeout(() => {
-          this.currentColor = this.baseParamColor[el]
-          this.opacityOnClick(this.currentColor)
+          let color = this.baseParamColor[el]
+          this.opacityValue[color] = true
+          setTimeout(() => {
+            this.opacityValue[color] = false
+            this.audioOnClick(color)
+          }, 300)
         }, level * (index + 1))
       })
     },
-    opacityOnClick(color, level = 200) {
+    opacityOnClick(color) {
       this.opacityValue[color] = true
+      this.isClickable = true
+      this.currentColor = color
       setTimeout(() => {
         this.opacityValue[color] = false
-      }, level)
+        this.isClickable = false
+        this.audioOnClick(color)
+      }, 200)
+    },
+    getKeyByValue(object, value) {
+      return Object.keys(object).find(key => object[key] === value);
+    },
+    checkUserArray() {
+      this.playerArray.forEach((el, index) => {
+        if (el !== this.gameArray[index]) {
+          this.gameOver = true
+          return
+        }
+      })
+
+      if (this.playerArray.length === this.gameArray.length && !this.gameOver) {
+        this.playerArray.length = 0
+        this.score++
+        this.startClick()
+      }
+    },
+    audioOnClick(color) {
+      let audio
+      switch (color) {
+        case("blueOpacity"):
+          audio = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound1.mp3")
+          audio.play()
+          break
+        case ("redOpacity"):
+          audio = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound2.mp3")
+          audio.play()
+          break
+        case ("yellowOpacity"):
+          audio = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound3.mp3")
+          audio.play()
+          break
+        case ("greenOpacity"):
+          audio = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound4.mp3")
+          audio.play()
+          break
+      }
     }
   },
+  watch: {
+    currentLevel() {
+      this.start = false
+      this.score = 0
+      this.gameArray.length = 0
+      this.playerArray.length = 0
+    },
+    isClickable() {
+      if (this.isClickable) {
+        let value = this.getKeyByValue(this.baseParamColor, this.currentColor)
+        this.playerArray.push(Number(value))
+        this.checkUserArray()
+      }
+    },
+    gameOver() {
+      if (this.gameOver) {
+        this.start = false
+        this.gameArray.length = 0
+        this.playerArray.length = 0
+        this.score = 0
+      }
+    }
+  },
+  computed: {
+    getLevel() {
+      return this.levels[this.currentLevel]
+    },
+
+  }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   @mixin base-params {
     width: 300px;
     height: 300px;
     opacity: .1;
     margin: 20px;
     cursor: pointer;
-    border: 0px solid;
+    border: 0 solid;
     border-radius: 5px;
   }
 
@@ -169,6 +261,15 @@ export default {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+
+      .lose {
+        color: red;
+        font-size: 30px;
+      }
+
+      .levelSelect {
+        display: flex;
+      }
 
       h1 {
         font-size: 50px;
