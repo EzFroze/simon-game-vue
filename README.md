@@ -1,19 +1,28 @@
-# medods-test-work-2
+# Игра Simon на Vue
 
-## Project setup
+## Установка зависимостей
+```
+npm install
+```
+или
 ```
 yarn install
 ```
 
-### Compiles and hot-reloads for development
+### Запуск в режиме разработки
+```
+npm run serve
+```
+или
 ```
 yarn serve
 ```
 
-### Compiles and minifies for production
+### Сборка приложения для продакшана
+```
+npm run build
+```
+или
 ```
 yarn build
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
