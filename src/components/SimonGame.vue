@@ -88,7 +88,7 @@ export default {
       this.gameOver = false
       this.startGameBot(this.getLevel)
     },
-    randomInteger(min, max) {
+    randomInteger(min, max) { // Выбор рандомного кубика
       const rand = min - 0.5 + Math.random() * (max - min + 1)
       return Math.round(rand)
     },
@@ -97,15 +97,15 @@ export default {
       this.gameArray.forEach((el, index) => {
         setTimeout(() => {
           let color = this.baseParamColor[el]
-          this.opacityValue[color] = true
+          this.opacityValue[color] = true // Установка цвета для загорания
           setTimeout(() => {
             this.opacityValue[color] = false
             this.audioOnClick(color)
           }, 300)
-        }, level * (index + 1))
+        }, level * (index + 1)) // index + 1 так как массив начинается с нуля
       })
     },
-    opacityOnClick(color) {
+    opacityOnClick(color) { // Загорание кубика при нажатии, воспроизведение звука и проверка последовательности
       this.opacityValue[color] = true
       this.isClickable = true
       this.currentColor = color
@@ -115,10 +115,10 @@ export default {
         this.audioOnClick(color)
       }, 200)
     },
-    getKeyByValue(object, value) {
+    getKeyByValue(object, value) { // Получение ключа (цвета) из объекта (baseParamColor)
       return Object.keys(object).find(key => object[key] === value);
     },
-    checkUserArray() {
+    checkUserArray() { // проверка последовательности пользователя
       this.playerArray.forEach((el, index) => {
         if (el !== this.gameArray[index]) {
           this.gameOver = true
@@ -132,7 +132,7 @@ export default {
         this.startClick()
       }
     },
-    audioOnClick(color) {
+    audioOnClick(color) { // Звуки при нажатии на один из кубиков
       let audio
       switch (color) {
         case("blueOpacity"):
@@ -155,13 +155,13 @@ export default {
     }
   },
   watch: {
-    currentLevel() {
+    currentLevel() { // Обнуление при изменении уровня сложности
       this.start = false
       this.score = 0
       this.gameArray.length = 0
       this.playerArray.length = 0
     },
-    isClickable() {
+    isClickable() { // Следим за кликами пользователя
       if (this.isClickable) {
         let value = this.getKeyByValue(this.baseParamColor, this.currentColor)
         this.playerArray.push(Number(value))
@@ -169,7 +169,7 @@ export default {
       }
     },
     gameOver() {
-      if (this.gameOver) {
+      if (this.gameOver) { // Обнуление при проигрыше
         this.start = false
         this.gameArray.length = 0
         this.playerArray.length = 0
@@ -178,7 +178,7 @@ export default {
     }
   },
   computed: {
-    getLevel() {
+    getLevel() { // Получение уровня из чекбоксов
       return this.levels[this.currentLevel]
     },
 
