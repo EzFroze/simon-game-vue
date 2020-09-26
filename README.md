@@ -1,5 +1,7 @@
 # Игра Simon на Vue
 
+## Игра лежит по ссылке https://ezfroze.github.io/simon-game-vue/
+
 ## Установка зависимостей
 ```
 npm install
